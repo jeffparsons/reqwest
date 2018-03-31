@@ -546,6 +546,11 @@ impl Future for PendingRequest {
                             self.url = loc;
 
                             remove_sensitive_headers(&mut self.headers, &self.url, &self.urls);
+
+                            // Restore all the default headers from the client;
+                            // they may have been stripped off above.
+                            self.headers.extend(self.client.headers.iter());
+
                             debug!("redirecting to {:?} '{}'", self.method, self.url);
                             let uri = to_uri(&self.url);
                             let mut req = ::hyper::Request::new(
